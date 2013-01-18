@@ -1,8 +1,7 @@
 (ns gagliardi.link-scraper.core
   (:require [net.cgrand.enlive-html :as e]
             [cemerick.url :refer [url]]
-            [clojure.pprint :refer [pprint]]
-            [clojure.string :refer [split join]]
+            [clojure.string :as s]
             [clj-http.client :as http])
   (:import [com.google.common.net InternetDomainName]
            [java.util.concurrent LinkedBlockingQueue]))
@@ -59,7 +58,7 @@
 (def total-urls (atom 0))
 
 (defn fill-queue! [filepath & [n]]
-  (let [urls (split (slurp filepath) #"\n")
+  (let [urls (s/split (slurp filepath) #"\n")
         urls (if n (take n urls) urls)]
     (doseq [url urls]
       (.put url-queue url))
@@ -89,8 +88,8 @@
                        linked    @linked-domains
                        total     @total-urls]
                    (println "Domains processed: " (count processed))
-                   (spit "linked-domains"   (join "\n" linked)) 
-                   (spit "urls-processed" (join "\n" processed)) 
+                   (spit "linked-domains"   (s/join "\n" linked)) 
+                   (spit "urls-processed" (s/join "\n" processed)) 
                    (when-let [run-again? (not= total (count processed))]
                      (Thread/sleep (:snapshot-delay config))
                      (recur run-again?))))))))
