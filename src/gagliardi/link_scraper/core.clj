@@ -65,7 +65,7 @@
     (swap! total-urls (fn [_] (.size url-queue)))))
 
 (defn worker-fn []
-  (when (> (.size url-queue) 0) 
+  (when (pos? (.size url-queue))
     (when-let [url (.poll url-queue)] 
       (try
         (let [domains (url->linked-domains url)]
