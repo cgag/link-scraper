@@ -85,12 +85,15 @@
   (Thread. (fn []
              (loop [running? true] 
                (when running?
-                 (println "Domains processed: " (count @urls-processed))
-                 (spit "domains-temp"   (join "\n" @linked-domains)) 
-                 (spit "processed-temp" (join "\n" @urls-processed)) 
-                 (when-let [run-again? (not= @total-urls (count @urls-processed))]
-                   (Thread/sleep (:snapshot-delay config))
-                   (recur run-again?)))))))
+                 (let [processed @urls-processed
+                       linked    @linked-domains
+                       total     @total-urls]
+                   (println "Domains processed: " (count processed))
+                   (spit "linked-domains"   (join "\n" linked)) 
+                   (spit "urls-processed" (join "\n" processed)) 
+                   (when-let [run-again? (not= total (count processed))]
+                     (Thread/sleep (:snapshot-delay config))
+                     (recur run-again?))))))))
 
 (defn start-workers! []
   (doseq [worker workers]
